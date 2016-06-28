@@ -83,11 +83,17 @@ public class PropertyImpl extends Property {
 
     @Override
     public final Object get(DynamicObject store, Shape shape) {
+
         return getLocation().get(store, shape);
     }
 
     @Override
     public final Object get(DynamicObject store, boolean condition) {
+
+        /* instrument this read */
+        if (RaceDetector.instrumentReadFlag) {
+            RaceDetector.add(OpType.READ, getLocation().toString());
+        }
         return getLocation().get(store, condition);
     }
 
@@ -108,6 +114,12 @@ public class PropertyImpl extends Property {
     @Override
     public final void set(DynamicObject store, Object value, Shape shape) throws IncompatibleLocationException, FinalLocationException {
         assert verifyShapeParameter(store, shape);
+
+        /* instrument write */
+        if (RaceDetector.instrumentWriteFlag) {
+            RaceDetector.add(OpType.WRITE, getLocation().toString());
+        }
+
         getLocation().set(store, value, shape);
     }
 
